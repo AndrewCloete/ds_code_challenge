@@ -30,7 +30,7 @@ class H3Repository:
     def query_features(self, source: H3Source, resolution_level: int = None):
 
         def build_expression(resolution_level: int = None):
-            where_clause = "" if resolution_level is None else f"WHERE feature.properties.resolution_level = {resolution_level}"
+            where_clause = "" if resolution_level is None else f"WHERE feature.properties.resolution = {resolution_level}"
             return f"""SELECT feature FROM S3Object[*].features[*] as feature {where_clause}"""
             
         def read_query_event_stream(event_stream) -> bytes:
@@ -57,7 +57,7 @@ class H3Repository:
 
         response = self.s3.select_object_content(
             Bucket=self.bucket_name,
-            Key=source,
+            Key=source.value,
             Expression=build_expression(resolution_level),
             ExpressionType='SQL',
             InputSerialization={'JSON': { 'Type': 'DOCUMENT' }},
