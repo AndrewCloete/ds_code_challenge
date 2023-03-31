@@ -10,6 +10,7 @@ from typing import Optional, List
 from enum import Enum
 
 from service.s3_client import S3ClientService
+from repository.cache import PoormansLocalFileCache
 
 class H3Source(Enum):
     LEVEL_8_to_10 = 'city-hex-polygons-8-10.geojson'
@@ -17,9 +18,10 @@ class H3Source(Enum):
 
 
 class H3Repository:
-    def __init__(self, bucket_name: str, s3_client_provider: S3ClientService):
+    def __init__(self, bucket_name: str, s3_client_provider: S3ClientService, cache_dir: str = None):
         self.bucket_name = bucket_name
         self.s3 = s3_client_provider.get_client()
+        self.cache = PoormansLocalFileCache(cache_dir)
 
     def feature_to_index(feature) -> str:
         return feature['properties']['index']
@@ -27,7 +29,15 @@ class H3Repository:
     def indexes(features: List[dict]) -> List[str]:
         return [H3Repository.feature_to_index(feature) for feature in features]
 
+    def __cache_name(self, source: H3Source, resolution_level: int = None):
+        return f"{source.name}_lvl{resolution_level}.json"
+
     def query_features(self, source: H3Source, resolution_level: int = None):
+
+        cache_name = self.__cache_name(source, resolution_level)
+        cache_result = self.cache.get(cache_name)
+        if cache_result is not None:
+            return json.loads(cache_result.decode('utf-8'))
 
         def build_expression(resolution_level: int = None):
             where_clause = "" if resolution_level is None else f"WHERE feature.properties.resolution = {resolution_level}"
@@ -64,6 +74,12 @@ class H3Repository:
             OutputSerialization={'JSON': { }}
             )
 
-        return parse_query_response(read_query_event_stream(response['Payload']))
+        results = parse_query_response(read_query_event_stream(response['Payload']))
+
+        
+        if results is not None:
+            self.cache.put(cache_name, json.dumps(results).encode('utf-8'))
+
+        return results
         
         
