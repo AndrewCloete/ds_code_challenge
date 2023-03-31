@@ -12,10 +12,6 @@ from secrets_provider import SecretsProvider
 from typing import TypedDict, Optional, List
 
 
-class ReadStreamResponse(TypedDict):
-    data: bytes
-    details: list
-    end_event_received: bool
 
 class H3Repository:
     def __init__(self, region: str, bucket_name: str, secrets_provider: SecretsProvider):
@@ -34,25 +30,27 @@ class H3Repository:
             where_clause = "" if resolution is None else f"WHERE feature.properties.resolution = {resolution}"
             return f"""SELECT feature FROM S3Object[*].features[*] as feature {where_clause}"""
             
-        def read_query_event_stream(event_stream) -> ReadStreamResponse:
+        def read_query_event_stream(event_stream) -> bytes:
             data = b''
-            details = []
             end_event_received = False
             for event in event_stream:
                 if 'Records' in event:
                     data += event['Records']['Payload']
-                # if 'Progress' in event:
-                #     details.append(event['Progress']['Details'])
                 if 'End' in event:
                     end_event_received = True
+
+            """
+            Would typically not raise an exception here, but rather return an
+            Optional type to allow the caller to handle the error. But this is
+            totally sufficient for this exercise.
+            """
+            if not end_event_received:
+                raise Exception("End event not received. Go have some tea")
+
+            return data
             
-            return {"data": data, "details":details, "end_event_received": end_event_received}
-            
-        def parse_query_response(response) -> Optional[list]:
-            if not response["end_event_received"]:
-                return None 
-            
-            return  [json.loads(line)["feature"] for line in response["data"].split()]
+        def parse_query_response(stream_data: bytes) -> Optional[list]:
+            return  [json.loads(line)["feature"] for line in stream_data.split()]
 
         response = self.s3.select_object_content(
             Bucket=self.bucket_name,
@@ -63,7 +61,6 @@ class H3Repository:
             OutputSerialization={'JSON': { }}
             )
 
-        streamResult = read_query_event_stream(response['Payload'])
-        return parse_query_response(streamResult)
+        return parse_query_response(read_query_event_stream(response['Payload']))
         
         
