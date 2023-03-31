@@ -20,10 +20,10 @@ class H3Source(Enum):
 
 
 class H3Repository:
-    def __init__(self, bucket_name: str, s3_client_provider: S3ClientService, cache_dir: str = None):
+    def __init__(self, bucket_name: str, s3_client_provider: S3ClientService, cache: PoormansLocalFileCache):
         self.bucket_name = bucket_name
         self.s3 = s3_client_provider.get_client()
-        self.cache = PoormansLocalFileCache(cache_dir)
+        self.cache = cache 
 
     def __cache_name(self, source: H3Source, resolution_level: int = None):
         return f"{source.name}_lvl{resolution_level}.geojson"

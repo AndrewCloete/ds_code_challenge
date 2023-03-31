@@ -12,10 +12,10 @@ class SRSource(Enum):
     JOINED = 'sr_hex.csv.gz'
 
 class ServiceRequestRepository:
-    def __init__(self, bucket_name: str, s3_client_provider: S3ClientService, cache_dir: str = None):
+    def __init__(self, bucket_name: str, s3_client_provider: S3ClientService, cache: PoormansLocalFileCache):
         self.bucket_name = bucket_name
         self.s3 = s3_client_provider.get_client()
-        self.cache = PoormansLocalFileCache(cache_dir)
+        self.cache = cache 
 
     def __cache_name(self, source: SRSource):
         return f"{source.name}.csv"
