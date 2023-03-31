@@ -8,12 +8,12 @@ References:
 import json
 from typing import Optional, List
 
-from s3_provider import S3ClientProvider
+from service.s3_client import S3ClientService
 
 class H3Repository:
-    def __init__(self, bucket_name: str, s3_client_provider: S3ClientProvider):
+    def __init__(self, bucket_name: str, s3_client_provider: S3ClientService):
         self.bucket_name = bucket_name
-        self.s3 = s3_client_provider.getClient()
+        self.s3 = s3_client_provider.get_client()
 
     def feature_to_index(feature) -> str:
         return feature['properties']['index']

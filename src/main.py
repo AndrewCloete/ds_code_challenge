@@ -1,8 +1,8 @@
 import json
 
-from secrets_provider import SecretsProvider
-from s3_provider import S3ClientProvider
-from h3_repository import H3Repository
+from service.secrets import SecretsService
+from service.s3_client import S3ClientService
+from repository.h3 import H3Repository
 import compare
 
 
@@ -12,8 +12,8 @@ KEY_RES_8_to_10 = 'city-hex-polygons-8-10.geojson'
 KEY_RES_8 = 'city-hex-polygons-8.geojson'
 
 
-s3_client_provider = S3ClientProvider(REGION, SecretsProvider())
-h3_repo = H3Repository(BUCKET_NAME, s3_client_provider)
+s3_client_service = S3ClientService(REGION, SecretsService())
+h3_repo = H3Repository(BUCKET_NAME, s3_client_service)
 
 
 l8_queried = h3_repo.query_features(KEY_RES_8_to_10, 8)

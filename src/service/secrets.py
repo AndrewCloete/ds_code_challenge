@@ -9,7 +9,7 @@ class S3Secrets(TypedDict):
 class Secrets(TypedDict):
     s3: S3Secrets
 
-class SecretsProvider:
+class SecretsService:
     def __init__(self, secrets_file_path='./.secrets.json'):
         self.secrets_file_path = secrets_file_path
 
