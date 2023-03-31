@@ -6,23 +6,14 @@ References:
 """
 
 import json
+from typing import Optional, List
 
-import boto3
-from secrets_provider import SecretsProvider
-from typing import TypedDict, Optional, List
-
-
+from s3_provider import S3ClientProvider
 
 class H3Repository:
-    def __init__(self, region: str, bucket_name: str, secrets_provider: SecretsProvider):
-        secrets = secrets_provider.get_secrets()
-        session = boto3.session.Session(
-            aws_access_key_id=secrets.s3.access_key,
-            aws_secret_access_key=secrets.s3.secret_key,
-            region_name=region
-        )
+    def __init__(self, bucket_name: str, s3_client_provider: S3ClientProvider):
         self.bucket_name = bucket_name
-        self.s3 = session.client('s3')
+        self.s3 = s3_client_provider.getClient()
 
     def feature_to_index(feature) -> str:
         return feature['properties']['index']
