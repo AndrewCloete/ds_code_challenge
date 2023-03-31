@@ -24,6 +24,12 @@ class H3Repository:
         self.bucket_name = bucket_name
         self.s3 = session.client('s3')
 
+    def feature_to_index(feature) -> str:
+        return feature['properties']['index']
+
+    def indexes(features: List[dict]) -> List[str]:
+        return [H3Repository.feature_to_index(feature) for feature in features]
+
     def query_features(self, key: str, resolution: int = None):
 
         def build_expression(resolution: int = None):
