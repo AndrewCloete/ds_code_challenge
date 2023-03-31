@@ -16,8 +16,8 @@ h3_repo = H3Repository(BUCKET_NAME, s3_client_service, H3_CACHE_DIR)
 sr_repo = ServiceRequestRepository(BUCKET_NAME, s3_client_service, SR_CACHE_DIR)
 
 
-entries = sr_repo.get_request_entries(SRSource.JOINED)
-# print(entries)
+df = sr_repo.get_request_entries(SRSource.JOINED)
+print(df)
 
 def get_h3():
     l8_queried = h3_repo.query_features(H3Source.LEVEL_8_to_10, resolution_level=8)
@@ -36,7 +36,7 @@ def get_h3():
     for comparitor in comparitors:
         comparitor(l8_queried_indexes, l8_given_indexes)
 
-get_h3()
+# get_h3()
 
 
 
