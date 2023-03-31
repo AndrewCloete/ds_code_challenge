@@ -1,3 +1,9 @@
+"""
+References:
+- https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3/client/select_object_content.html
+- https://docs.aws.amazon.com/AmazonS3/latest/API/API_SelectObjectContent.html#API_SelectObjectContent_RequestSyntax
+- https://botocore.amazonaws.com/v1/documentation/api/latest/reference/eventstream.html
+"""
 
 import boto3
 from secrets_provider import SecretsProvider
