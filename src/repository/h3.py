@@ -9,6 +9,8 @@ import json
 from typing import Optional, List
 from enum import Enum
 
+import geopandas as gpd
+
 from service.s3_client import S3ClientService
 from repository.cache import PoormansLocalFileCache
 
@@ -23,21 +25,18 @@ class H3Repository:
         self.s3 = s3_client_provider.get_client()
         self.cache = PoormansLocalFileCache(cache_dir)
 
-    def feature_to_index(feature) -> str:
-        return feature['properties']['index']
-
-    def indexes(features: List[dict]) -> List[str]:
-        return [H3Repository.feature_to_index(feature) for feature in features]
-
     def __cache_name(self, source: H3Source, resolution_level: int = None):
-        return f"{source.name}_lvl{resolution_level}.json"
+        return f"{source.name}_lvl{resolution_level}.geojson"
 
-    def query_features(self, source: H3Source, resolution_level: int = None):
+    def __cache_file_path_handler(cache_path: str):
+        return gpd.read_file(cache_path, driver="GeoJSON")
+
+    def query_features(self, source: H3Source, resolution_level: int = None) -> gpd.GeoDataFrame:
 
         cache_name = self.__cache_name(source, resolution_level)
-        cache_result = self.cache.get(cache_name)
+        cache_result = self.cache.get(cache_name, H3Repository.__cache_file_path_handler)
         if cache_result is not None:
-            return json.loads(cache_result.decode('utf-8'))
+            cache_result
 
         def build_expression(resolution_level: int = None):
             where_clause = "" if resolution_level is None else f"WHERE feature.properties.resolution = {resolution_level}"
@@ -76,10 +75,9 @@ class H3Repository:
 
         results = parse_query_response(read_query_event_stream(response['Payload']))
 
-        
         if results is not None:
-            self.cache.put(cache_name, json.dumps(results).encode('utf-8'))
-
-        return results
+            self.cache.put(cache_name, json.dumps({"type": "FeatureCollection", "features": results}).encode('utf-8'))
+        
+        return self.cache.get(cache_name, H3Repository.__cache_file_path_handler)
         
         

@@ -1,6 +1,5 @@
 from enum import Enum
 import gzip
-from io import StringIO
 
 import pandas as pd
 
@@ -21,18 +20,18 @@ class ServiceRequestRepository:
     def __cache_name(self, source: SRSource):
         return f"{source.name}.csv"
 
-    def __as_dataframe(bytes_data: bytes) -> pd.DataFrame:
-        return pd.read_csv(StringIO(bytes_data.decode('utf-8')))
+    def __cache_file_path_handler(cache_path: str):
+        return pd.read_csv(cache_path)
 
     def get_request_entries(self, source: SRSource) -> pd.DataFrame:
-        cache_result = self.cache.get(self.__cache_name(source))
+        cache_result = self.cache.get(self.__cache_name(source), ServiceRequestRepository.__cache_file_path_handler)
         if cache_result is not None:
-            return ServiceRequestRepository.__as_dataframe(cache_result)
+            return cache_result 
 
         response = self.s3.get_object(Bucket=self.bucket_name, Key=source.value)
         uncompressed = gzip.decompress(response["Body"].read())
         self.cache.put(self.__cache_name(source), uncompressed)
-        return ServiceRequestRepository.__as_dataframe(cache_result)
+        return self.cache.get(self.__cache_name(source), ServiceRequestRepository.__cache_file_path_handler)
     
 
 

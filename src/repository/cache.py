@@ -11,12 +11,14 @@ class PoormansLocalFileCache:
             return None
         return f"{self.cache_dir}/{name}"
 
-    def get(self, name: str):
+    def get(self, name: str, file_path_handler = None):
         if self.cache_dir is None:
             return None
         cache_path = self.__cache_path(name)
         if not Path(cache_path).is_file():
             return None
+        if file_path_handler is not None:
+            return file_path_handler(cache_path)
         with open(cache_path, "rb") as f:
             return f.read()
 
