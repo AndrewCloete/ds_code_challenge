@@ -7,8 +7,14 @@ References:
 
 import json
 from typing import Optional, List
+from enum import Enum
 
 from service.s3_client import S3ClientService
+
+class H3Source(Enum):
+    LEVEL_8_to_10 = 'city-hex-polygons-8-10.geojson'
+    LEVEL_8_ONLY = 'city-hex-polygons-8.geojson'
+
 
 class H3Repository:
     def __init__(self, bucket_name: str, s3_client_provider: S3ClientService):
@@ -21,10 +27,10 @@ class H3Repository:
     def indexes(features: List[dict]) -> List[str]:
         return [H3Repository.feature_to_index(feature) for feature in features]
 
-    def query_features(self, key: str, resolution: int = None):
+    def query_features(self, source: H3Source, resolution_level: int = None):
 
-        def build_expression(resolution: int = None):
-            where_clause = "" if resolution is None else f"WHERE feature.properties.resolution = {resolution}"
+        def build_expression(resolution_level: int = None):
+            where_clause = "" if resolution_level is None else f"WHERE feature.properties.resolution_level = {resolution_level}"
             return f"""SELECT feature FROM S3Object[*].features[*] as feature {where_clause}"""
             
         def read_query_event_stream(event_stream) -> bytes:
@@ -37,7 +43,7 @@ class H3Repository:
                     end_event_received = True
 
             """
-            Would typically not raise an exception here, but rather return an
+            Would typically not raise an exception here and rather return an
             Optional type to allow the caller to handle the error. But this is
             totally sufficient for this exercise.
             """
@@ -51,8 +57,8 @@ class H3Repository:
 
         response = self.s3.select_object_content(
             Bucket=self.bucket_name,
-            Key=key,
-            Expression=build_expression(resolution),
+            Key=source,
+            Expression=build_expression(resolution_level),
             ExpressionType='SQL',
             InputSerialization={'JSON': { 'Type': 'DOCUMENT' }},
             OutputSerialization={'JSON': { }}
