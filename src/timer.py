@@ -7,7 +7,7 @@ def time_the_thing(description: str):
             result = func(*args, **kwargs)
             end = time.time()
             duration = end - start
-            print("%s: %.3f us" % (description, duration*1e6))
+            print("%s: %.3f sec" % (description, duration))
             return result
         return wrap2
     return wrap1

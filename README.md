@@ -31,13 +31,18 @@ vim .secrets.json
 # https://cct-ds-code-challenge-input-data.s3.af-south-1.amazonaws.com/ds_code_challenge_creds.json
 ```
 
-# Running the code
+# Testing the repositories
+Data access has been abstracted into repositories so that the logic in the notebook can stay in the business layer. Please run the test to ensure the repositories are configured correctly. These will also cache some data locally to speed up the notebook. 
 ```sh
-python src/main.py
+python src/integration_test.py
 ```
 
 # Running the notebook
-You can run the notebook by running the following command in the root of the project and selecting the notebook
+I settled on using Jupyter notebooks as a way to document the process. One would
+obviously not use a notebook in a production pipeline. (Personally, I'm not a
+big fan of notebooks so I'm not sure why I did this to myself). You can run the
+notebook by running the following command in the root of the project and
+selecting the notebook.
 ```sh
 python -m jupyter notebook
 ```
