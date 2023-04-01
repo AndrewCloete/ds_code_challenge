@@ -1,5 +1,10 @@
 See original README from fork at [./fork_readme.md](./fork_readme.md)
 
+# Declaration
+I Andrew Cloete, hereby declare that this is my own work and that all sources
+that I have used are indicated and acknowledged by means of references. Github
+Copilot was enabled during the development of this project. 
+
 
 # Getting started
 ```sh
