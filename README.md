@@ -41,5 +41,9 @@ python src/main.py
 python -m jupyter notebook
 ```
 
+# Process time request
+Since the Jupyter notebook cells show the execution time, I've split the cells
+so as to easily see the time for specific operations as requested.
+
 
 # Cleaning up
