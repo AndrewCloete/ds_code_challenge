@@ -7,3 +7,4 @@ jupyter
 folium
 seaborn
 h3
+odfpy

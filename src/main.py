@@ -3,6 +3,7 @@ from service.s3_client import S3ClientService
 from repository.h3 import H3Repository, H3Source
 from repository.service_request import ServiceRequestRepository, SRSource
 from repository.cache import PoormansLocalFileCache
+from repository.winddata import WindDataRepository
 import compare
 
 
@@ -15,6 +16,8 @@ s3_client_service = S3ClientService(REGION, SecretsService())
 repo_cache = PoormansLocalFileCache(CACHE_DIR)
 h3_repo = H3Repository(BUCKET_NAME, s3_client_service, repo_cache)
 sr_repo = ServiceRequestRepository(BUCKET_NAME, s3_client_service, repo_cache)
+winddata_repo = WindDataRepository()
+winddata_repo.get_as_dataframe()
 
 
 # df = sr_repo.get_request_entries(SRSource.UNJOINED)
@@ -26,7 +29,7 @@ def get_h3():
     cmp = df_l8_given["index"].compare(df_l8_queried["index"])
     assert cmp.empty
 
-get_h3()
+# get_h3()
 
 
 
