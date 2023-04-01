@@ -2,8 +2,9 @@ See original README from fork at [./fork_readme.md](./fork_readme.md)
 
 # Declaration
 I Andrew Cloete, hereby declare that this is my own work and that all sources
-that I have used are indicated and acknowledged by means of references. Github
-Copilot was enabled during the development of this project. 
+that I have used are indicated and acknowledged by means of references. I have
+not consulted any prior attempts at this exercise. Github Copilot was enabled
+during the development of this project. 
 
 
 # Getting started
@@ -46,7 +47,7 @@ selecting the notebook.
 ```sh
 python -m jupyter notebook
 ```
-Personally, I prefer to run the notebook in VSCode. On opening, VSCode will prompt you to select the virtual environment to run the kernel. This assumes you have the Jupyter extension installed. 
+I prefer to run the notebook in VSCode. On opening, VSCode will prompt you to select the virtual environment to run the kernel. This assumes you have the Jupyter extension installed. 
 
 
 # Request for visibility on process time
