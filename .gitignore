@@ -2,3 +2,6 @@ env
 .secrets.json
 __pycache__
 cache
+
+# Jupyter Notebook
+.ipynb_checkpoints

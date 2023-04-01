@@ -31,5 +31,10 @@ vim .secrets.json
 python src/main.py
 ```
 
+# Running the notebook
+```sh
+python -m jupyter notebook
+```
+
 
 # Cleaning up
