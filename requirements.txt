@@ -4,3 +4,6 @@ geopandas
 matplotlib
 ipython
 jupyter
+folium
+seaborn
+h3
