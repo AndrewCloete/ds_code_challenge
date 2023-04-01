@@ -37,13 +37,15 @@ python src/main.py
 ```
 
 # Running the notebook
+You can run the notebook by running the following command in the root of the project and selecting the notebook
 ```sh
 python -m jupyter notebook
 ```
+Personally, I prefer to run the notebook in VSCode. On opening, VSCode will prompt you to select the virtual environment to run the kernel. This assumes you have the Jupyter extension installed. 
 
-# Process time request
+
+# Request for visibility on process time
 Since the Jupyter notebook cells show the execution time, I've split the cells
 so as to easily see the time for specific operations as requested.
 
-
-# Cleaning up
+I've added local file caching logic to some of the repositories to speed things up so don't be alarmed as execution time variance.
