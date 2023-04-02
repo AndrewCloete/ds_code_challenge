@@ -50,6 +50,10 @@ def test_winddata_repo():
     assert(l > 8000)
     assert(w == 15)
 
+"""
+Deliberately not using a test runner like py-test since they blur the line with
+unit tests which ought not to be doing I/O operations.
+"""
 @time_the_thing("test_all")
 def test_all():
     test_service_request_repo()

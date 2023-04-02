@@ -63,7 +63,7 @@ I settled on using Jupyter notebooks as a way to document the process. One would
 obviously not use a notebook in a production pipeline. (Personally, I'm not a
 big fan of notebooks so I'm not sure why I did this to myself). You can run the
 notebook by running the following command in the root of the project and
-selecting the notebook.
+selecting `notebook.ipynb`. 
 ```sh
 python -m jupyter notebook
 ```
@@ -71,7 +71,8 @@ I prefer to run the notebook in VSCode. On opening, VSCode will prompt you to se
 
 
 # Request for visibility on process time
-Since the Jupyter notebook cells show the execution time, I've split the cells
-so as to easily see the time for specific operations as requested.
+Since the Jupyter notebook in VScode cells show the execution time, I've split
+the cells so as to easily see the time for specific operations as requested. If running in the browser I've added the `%%time` magic command to the relevant cells.
 
-I've added local file caching logic to some of the repositories to speed things up so don't be alarmed as execution time variance.
+I've added local file caching logic to some of the repositories to speed things
+up so don't be alarmed as execution time variance.
