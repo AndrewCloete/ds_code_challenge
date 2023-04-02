@@ -35,8 +35,16 @@ class H3Repository:
 
         cache_name = self.__cache_name(source, resolution_level)
         cache_result = self.cache.get(cache_name, H3Repository.__cache_file_path_handler)
+
+        """
+        Embedded print statements like these should not be used in production
+        code since they are side-effects. But they are useful for this exercise.
+        """
+
         if cache_result is not None:
-            cache_result
+            print("Using cached", cache_name)
+            return cache_result
+        print("Cache miss for", cache_name)
 
         def build_expression(resolution_level: int = None):
             where_clause = "" if resolution_level is None else f"WHERE feature.properties.resolution = {resolution_level}"

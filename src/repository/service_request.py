@@ -24,14 +24,17 @@ class ServiceRequestRepository:
         return pd.read_csv(cache_path)
 
     def get_request_entries(self, source: SRSource) -> pd.DataFrame:
-        cache_result = self.cache.get(self.__cache_name(source), ServiceRequestRepository.__cache_file_path_handler)
+        cache_name = self.__cache_name(source)
+        cache_result = self.cache.get(cache_name, ServiceRequestRepository.__cache_file_path_handler)
         if cache_result is not None:
+            print("Using cached", cache_name)
             return cache_result 
+        print("Cache miss for", cache_name)
 
         response = self.s3.get_object(Bucket=self.bucket_name, Key=source.value)
         uncompressed = gzip.decompress(response["Body"].read())
-        self.cache.put(self.__cache_name(source), uncompressed)
-        return self.cache.get(self.__cache_name(source), ServiceRequestRepository.__cache_file_path_handler)
+        self.cache.put(cache_name, uncompressed)
+        return self.cache.get(cache_name, ServiceRequestRepository.__cache_file_path_handler)
     
 
 

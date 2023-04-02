@@ -28,7 +28,6 @@ def test_service_request_repo():
 def test_h3_repo():
     df_l8_queried = h3_repo.query_features(H3Source.LEVEL_8_to_10, resolution_level=8)
     (l, w) = df_l8_queried.shape
-    print(f"l8: {l} x {w}")
     assert(l > 3800)
     assert(w == 5)
 
@@ -51,10 +50,15 @@ def test_winddata_repo():
     assert(l > 8000)
     assert(w == 15)
 
-test_service_request_repo()
-test_h3_repo()
-test_compare_h3_select()
-test_winddata_repo()
+@time_the_thing("test_all")
+def test_all():
+    test_service_request_repo()
+    test_h3_repo()
+    test_compare_h3_select()
+    test_winddata_repo()
+    print("Done!")
+
+test_all()
 
 
 
