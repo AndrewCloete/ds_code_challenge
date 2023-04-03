@@ -14,7 +14,9 @@ misalignment in my expectation for this role. I've assumed that the
 responsibilities of this would more to do with the design, implementation and
 maintenance of OLAP systems, as opposed to the wrangling of the data for local
 of analysis. Consequently, I had to brush off my rusty Pandas and matplotlib
-skills and rediscovered the pains of Jupyter notebooks. But, I also understand that these exercises naturally need be limited in scope and time so I look forward to discussing the full scope of the role with you.
+skills and rediscovered the pains of Jupyter notebooks. But, I also understand
+that these exercises can only be proxies and naturally need be limited in scope
+and time so I look forward to discussing the full scope of the role with you.
 
 # Requirements
 - Python 3.10.* 
