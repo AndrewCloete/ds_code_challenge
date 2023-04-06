@@ -1,7 +1,17 @@
 
+"""
+References:
+https://holoviz.org/tutorial/Interactive_Pipelines.html
+https://github.com/sophiamyang/hvplot_interactive/blob/main/hvplot_interactive.ipynb
+https://towardsdatascience.com/3-ways-to-build-a-panel-visualization-dashboard-6e14148f529d
+"""
+
 #%% 
 import pandas as pd
+import geopandas as gpd
 import panel as pn
+import h3
+import matplotlib.pyplot as plt
 
 pn.extension('tabulator', sizing_mode="stretch_width")
 import hvplot.pandas
@@ -26,14 +36,14 @@ sr_repo = ServiceRequestRepository(BUCKET_NAME, s3_client_service, repo_cache)
 
 #%% Fetch data
 df = sr_repo.get_request_entries(SRSource.JOINED)
-#df = df[df["h3_level8_index"] != '0']
+df = df[df["h3_level8_index"] != '0']
 
-#%% 
+#%% To datetime
 df.creation_timestamp  = pd.to_datetime(df.creation_timestamp).dt.tz_localize(None)
 df.completion_timestamp = pd.to_datetime(df.completion_timestamp).dt.tz_localize(None)
 df["duration"] = df.completion_timestamp - df.creation_timestamp
 
-#%%
+#%% Date edges
 create_start = df.creation_timestamp.min()
 create_end = df.creation_timestamp.max()
 complete_start = df.completion_timestamp.min()
@@ -42,16 +52,40 @@ dur_max = df["duration"].max()
 print(f"create_start: {create_start}, create_end: {create_end}, complete_start: {complete_start}, complete_end: {complete_end}, dur_max: {dur_max}")
 
 #%%
+hex_col = 'h3_level8_index'
+df['h3_lat'] = df[hex_col].apply(lambda x: h3.h3_to_geo(x)[0])
+df['h3_lng'] = df[hex_col].apply(lambda x: h3.h3_to_geo(x)[1])
+
+#%%
 small_df = df.sample(frac=.01)
-df_ws = df[df["directorate"] == "WATER AND SANITATION"]
+df_was = df[df["directorate"] == "WATER AND SANITATION"]
 l_all = df.shape[0]
-l_ws = df_ws.shape[0]
+l_ws = df_was.shape[0]
 print(l_all, l_ws, l_ws/l_all)
 
 #%%
-codes = df_ws['cause_code_group'].unique().tolist()
-sections = df_ws['section'].unique().tolist()
-cause_code_groups = df_ws['cause_code_group'].unique().tolist()
+# Aggregate service requests by hexagon
+dfg = df_was.groupby(hex_col).size().to_frame('cnt').reset_index()
+dfg['latitude'] = dfg[hex_col].apply(lambda x: h3.h3_to_geo(x)[0])
+dfg['longitude'] = dfg[hex_col].apply(lambda x: h3.h3_to_geo(x)[1])
+
+# Create the geodataframe for the aggregated service requests
+gdfg = gpd.GeoDataFrame(
+    dfg, geometry=gpd.points_from_xy(dfg['longitude'], dfg['latitude']))
+
+#%%
+count_max = dfg['cnt'].max()
+count_slide = pn.widgets.RangeSlider(name='Count', start=0, end=count_max)
+igdfg = gdfg.interactive()
+igdfg.hvplot(kind='scatter', x='h3_lng', y='h3_lat', c='cnt', cmap='viridis', responsive=True, size=10, alpha=0.3)
+
+
+
+
+#%%
+codes = df_was['cause_code_group'].unique().tolist()
+sections = df_was['section'].unique().tolist()
+cause_code_groups = df_was['cause_code_group'].unique().tolist()
 
 #%%
 check_cause_codes = pn.widgets.CheckButtonGroup(
@@ -62,6 +96,12 @@ check_cause_codes = pn.widgets.CheckButtonGroup(
 create_slide = pn.widgets.DateRangeSlider(name='Date', start=create_start, end=create_end)
 
 #%%
-idf = df_ws.interactive()
+fig, ax = plt.subplots(figsize=(20, 10))
+gdfg.plot(ax=ax, column='cnt', alpha=0.3, legend=True, markersize=10)
+#%%
+df.plot()
+
+#%%
+idf = df_was.interactive()
 idfg = df.groupby("official_suburb")['notification_number'].sum()
 idfg.hvplot(kind='hist', responsive=True)

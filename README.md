@@ -29,7 +29,7 @@ git clone git@github.com:AndrewCloete/ds_code_challenge.git && cd ds_code_challe
 
 # Start a new virtual environment
 rm -rf env # Remove any existing virtual environment
-python3 -m venv env
+python3.10 -m venv env
 activate
 # or
 source env/bin/activate

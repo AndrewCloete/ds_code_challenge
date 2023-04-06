@@ -12,4 +12,7 @@ geojson
 
 panel
 hvplot
+pyviz
+geoviews
 jupyter_bokeh
+pyct
