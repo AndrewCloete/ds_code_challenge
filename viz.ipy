@@ -1,0 +1,67 @@
+
+#%% 
+import pandas as pd
+import panel as pn
+
+pn.extension('tabulator', sizing_mode="stretch_width")
+import hvplot.pandas
+import holoviews as hv
+hv.extension('bokeh')
+
+import sys
+sys.path.append("./src") # not pretty, but works for now
+
+from service.secrets import SecretsService
+from service.s3_client import S3ClientService
+from repository.service_request import ServiceRequestRepository, SRSource
+from repository.cache import PoormansLocalFileCache
+
+REGION = 'af-south-1'
+BUCKET_NAME = 'cct-ds-code-challenge-input-data'
+CACHE_DIR = './cache'
+
+s3_client_service = S3ClientService(REGION, SecretsService())
+repo_cache = PoormansLocalFileCache(CACHE_DIR)
+sr_repo = ServiceRequestRepository(BUCKET_NAME, s3_client_service, repo_cache)
+
+#%% Fetch data
+df = sr_repo.get_request_entries(SRSource.JOINED)
+#df = df[df["h3_level8_index"] != '0']
+
+#%% 
+df.creation_timestamp  = pd.to_datetime(df.creation_timestamp).dt.tz_localize(None)
+df.completion_timestamp = pd.to_datetime(df.completion_timestamp).dt.tz_localize(None)
+df["duration"] = df.completion_timestamp - df.creation_timestamp
+
+#%%
+create_start = df.creation_timestamp.min()
+create_end = df.creation_timestamp.max()
+complete_start = df.completion_timestamp.min()
+complete_end = df.completion_timestamp.max()
+dur_max = df["duration"].max()
+print(f"create_start: {create_start}, create_end: {create_end}, complete_start: {complete_start}, complete_end: {complete_end}, dur_max: {dur_max}")
+
+#%%
+small_df = df.sample(frac=.01)
+df_ws = df[df["directorate"] == "WATER AND SANITATION"]
+l_all = df.shape[0]
+l_ws = df_ws.shape[0]
+print(l_all, l_ws, l_ws/l_all)
+
+#%%
+codes = df_ws['cause_code_group'].unique().tolist()
+sections = df_ws['section'].unique().tolist()
+cause_code_groups = df_ws['cause_code_group'].unique().tolist()
+
+#%%
+check_cause_codes = pn.widgets.CheckButtonGroup(
+    name='cause_code_group', 
+    options=cause_code_groups,
+    button_type='success'
+)
+create_slide = pn.widgets.DateRangeSlider(name='Date', start=create_start, end=create_end)
+
+#%%
+idf = df_ws.interactive()
+idfg = df.groupby("official_suburb")['notification_number'].sum()
+idfg.hvplot(kind='hist', responsive=True)

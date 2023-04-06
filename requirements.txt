@@ -9,3 +9,7 @@ seaborn
 h3
 odfpy
 geojson
+
+panel
+hvplot
+jupyter_bokeh
